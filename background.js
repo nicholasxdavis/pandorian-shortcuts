@@ -10,22 +10,17 @@ const DEFAULT_SHORTCUTS = [
   { key: "amz", url: "https://www.amazon.com/s?k={q}", name: "Amazon" }
 ];
 
-// Initialize with defaults immediately to prevent race conditions
 let shortcutsCache = DEFAULT_SHORTCUTS;
 let isEnabled = true;
 
 // 1. Load Data Immediately
 function refreshData() {
   chrome.storage.sync.get(["shortcuts", "enabled"], (data) => {
-    // If shortcuts exist in storage, use them. 
-    // If not (undefined), we keep the DEFAULT_SHORTCUTS we set above.
     if (data.shortcuts) {
       shortcutsCache = data.shortcuts;
     } else {
-      // First time run? Save defaults to storage
       chrome.storage.sync.set({ shortcuts: DEFAULT_SHORTCUTS });
     }
-    
     if (data.enabled !== undefined) {
       isEnabled = data.enabled;
     }
@@ -36,7 +31,6 @@ chrome.runtime.onInstalled.addListener(refreshData);
 chrome.runtime.onStartup.addListener(refreshData);
 refreshData();
 
-// 2. Listen for changes to update cache instantly
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync') {
     if (changes.shortcuts) shortcutsCache = changes.shortcuts.newValue;
@@ -48,7 +42,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
 function getSearchQuery(urlObj) {
   try {
     const h = urlObj.hostname;
-    // Common search engines
+    // Handle various search engine params
     if (h.includes("google") || h.includes("bing") || h.includes("ecosia") || h.includes("duckduckgo")) {
       return urlObj.searchParams.get("q") || urlObj.searchParams.get("query");
     }
@@ -61,44 +55,43 @@ function getSearchQuery(urlObj) {
 
 // 4. Navigation Handler
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  // Check 'url' in changeInfo (early) OR 'tab.url' (late but reliable)
   const currentUrl = changeInfo.url || tab.url;
   
   if (!currentUrl || !isEnabled || !currentUrl.startsWith('http')) return;
 
-  // We only care about search engine URLs
   try {
     const urlObj = new URL(currentUrl);
-    const query = getSearchQuery(urlObj);
+    const rawQuery = getSearchQuery(urlObj);
     
-    if (!query) return;
+    if (!rawQuery) return;
 
-    // Decode: "drake%20%40g" -> "drake @g"
-    // We decode twice to be safe against double encoding
-    let decoded = decodeURIComponent(query);
-    try { decoded = decodeURIComponent(decoded); } catch(e) { /* ignore */ }
+    // --- CRITICAL FIX ---
+    // 1. Replace '+' with ' ' (Google uses + for spaces, JS regex needs spaces)
+    // 2. Decode the result (Turn %40 into @)
+    let cleanString = rawQuery.replace(/\+/g, ' ');
+    cleanString = decodeURIComponent(cleanString);
     
     let targetShortcut = null;
-    let cleanQuery = decoded;
+    let finalQuery = cleanString;
 
     // Check shortcuts
     for (const s of shortcutsCache) {
       const tag = "@" + s.key;
       
-      // We look for the tag at start, end, or surrounded by spaces
-      // Regex: (^|\s)@tag($|\s) -- Case Insensitive
+      // Look for tag at start (^), end ($), or surrounded by whitespace (\s)
       const regex = new RegExp(`(^|\s)${tag}($|\s)`, 'i');
       
-      if (regex.test(decoded)) {
+      if (regex.test(cleanString)) {
         targetShortcut = s;
-        cleanQuery = decoded.replace(regex, " ").trim();
+        // Remove the tag from the query and trim whitespace
+        finalQuery = cleanString.replace(regex, " ").trim();
         break; 
       }
     }
 
     if (targetShortcut) {
       let finalUrl = targetShortcut.url;
-      const encodedQuery = encodeURIComponent(cleanQuery);
+      const encodedQuery = encodeURIComponent(finalQuery);
       finalUrl = finalUrl.replace("{q}", encodedQuery);
       
       console.log(`[Pandorian] Redirecting to ${targetShortcut.name}`);
@@ -106,6 +99,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
 
   } catch (e) {
-    // URL parsing failed, ignore
+    console.error("[Pandorian Error]", e);
   }
 });

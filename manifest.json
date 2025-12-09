@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Pandorian",
-  "version": "1.2.0",
-  "description": "The ultimate command bar for your browser. Use @tags to navigate instantly.",
+  "version": "2.0.0",
+  "description": "The ultimate command bar for your browser. Use @tags to navigate instantly with advanced features.",
   "permissions": [
     "storage",
     "tabs",
-    "webNavigation"
+    "webNavigation",
+    "history"
   ],
   "host_permissions": [
     "*://www.google.com/*",
@@ -28,6 +29,22 @@
     }
   },
   "options_page": "options.html",
+  "commands": {
+    "open-command-palette": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+P",
+        "mac": "Command+Shift+P"
+      },
+      "description": "Open Pandorian Command Palette"
+    },
+    "quick-search": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+K",
+        "mac": "Command+Shift+K"
+      },
+      "description": "Quick Search with Pandorian"
+    }
+  },
   "icons": {
     "16": "img/logo.png",
     "48": "img/logo.png",

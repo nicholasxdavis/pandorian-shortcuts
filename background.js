@@ -1,6 +1,4 @@
 // Pandorian Core Logic
-let shortcutsCache = [];
-let isEnabled = true;
 
 const DEFAULT_SHORTCUTS = [
   { key: "s", url: "https://open.spotify.com/search/{q}", name: "Spotify" },
@@ -12,15 +10,24 @@ const DEFAULT_SHORTCUTS = [
   { key: "amz", url: "https://www.amazon.com/s?k={q}", name: "Amazon" }
 ];
 
+// Initialize with defaults immediately to prevent race conditions
+let shortcutsCache = DEFAULT_SHORTCUTS;
+let isEnabled = true;
+
 // 1. Load Data Immediately
 function refreshData() {
   chrome.storage.sync.get(["shortcuts", "enabled"], (data) => {
-    shortcutsCache = data.shortcuts || DEFAULT_SHORTCUTS;
-    isEnabled = data.enabled !== false;
-    
-    // Save defaults if empty
-    if (!data.shortcuts) {
+    // If shortcuts exist in storage, use them. 
+    // If not (undefined), we keep the DEFAULT_SHORTCUTS we set above.
+    if (data.shortcuts) {
+      shortcutsCache = data.shortcuts;
+    } else {
+      // First time run? Save defaults to storage
       chrome.storage.sync.set({ shortcuts: DEFAULT_SHORTCUTS });
+    }
+    
+    if (data.enabled !== undefined) {
+      isEnabled = data.enabled;
     }
   });
 }
@@ -43,7 +50,7 @@ function getSearchQuery(urlObj) {
     const h = urlObj.hostname;
     // Common search engines
     if (h.includes("google") || h.includes("bing") || h.includes("ecosia") || h.includes("duckduckgo")) {
-      return urlObj.searchParams.get("q");
+      return urlObj.searchParams.get("q") || urlObj.searchParams.get("query");
     }
     if (h.includes("yahoo")) {
       return urlObj.searchParams.get("p");
@@ -69,7 +76,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     // Decode: "drake%20%40g" -> "drake @g"
     // We decode twice to be safe against double encoding
     let decoded = decodeURIComponent(query);
-    try { decoded = decodeURIComponent(decoded); } catch(e) {}
+    try { decoded = decodeURIComponent(decoded); } catch(e) { /* ignore */ }
     
     let targetShortcut = null;
     let cleanQuery = decoded;

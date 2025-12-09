@@ -13,28 +13,49 @@ const DEFAULT_SHORTCUTS = [
 let shortcutsCache = DEFAULT_SHORTCUTS;
 let isEnabled = true;
 
+function log(msg, ...args) {
+    console.log(`[Pandorian] ${msg}`, ...args);
+}
+
 // 1. Load Data Immediately
 function refreshData() {
+  log("Refreshing data...");
   chrome.storage.sync.get(["shortcuts", "enabled"], (data) => {
     if (data.shortcuts) {
       shortcutsCache = data.shortcuts;
+      log("Loaded shortcuts from storage:", shortcutsCache.length);
     } else {
+      log("No shortcuts in storage, using defaults.");
       chrome.storage.sync.set({ shortcuts: DEFAULT_SHORTCUTS });
     }
     if (data.enabled !== undefined) {
       isEnabled = data.enabled;
+      log("Extension enabled state:", isEnabled);
     }
   });
 }
 
-chrome.runtime.onInstalled.addListener(refreshData);
-chrome.runtime.onStartup.addListener(refreshData);
+chrome.runtime.onInstalled.addListener(() => {
+    log("Extension Installed");
+    refreshData();
+});
+chrome.runtime.onStartup.addListener(() => {
+    log("Extension Startup");
+    refreshData();
+});
 refreshData();
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync') {
-    if (changes.shortcuts) shortcutsCache = changes.shortcuts.newValue;
-    if (changes.enabled) isEnabled = changes.enabled.newValue;
+    log("Storage changed");
+    if (changes.shortcuts) {
+        shortcutsCache = changes.shortcuts.newValue;
+        log("Shortcuts updated. New count:", shortcutsCache.length);
+    }
+    if (changes.enabled) {
+        isEnabled = changes.enabled.newValue;
+        log("Enabled state changed:", isEnabled);
+    }
   }
 });
 
@@ -59,11 +80,23 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   
   if (!currentUrl || !isEnabled || !currentUrl.startsWith('http')) return;
 
+  // We check if it looks like a search engine URL to save processing
+  if (!currentUrl.includes('q=') && !currentUrl.includes('query=') && !currentUrl.includes('p=')) {
+      return;
+  }
+
+  log("Processing URL:", currentUrl);
+
   try {
     const urlObj = new URL(currentUrl);
     const rawQuery = getSearchQuery(urlObj);
     
-    if (!rawQuery) return;
+    if (!rawQuery) {
+        log("No query param found in search URL");
+        return;
+    }
+
+    log("Raw query found:", rawQuery);
 
     // --- CRITICAL FIX ---
     // 1. Replace '+' with ' ' (Google uses + for spaces, JS regex needs spaces)
@@ -71,6 +104,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     let cleanString = rawQuery.replace(/\+/g, ' ');
     cleanString = decodeURIComponent(cleanString);
     
+    log("Clean string to check:", cleanString);
+
     let targetShortcut = null;
     let finalQuery = cleanString;
 
@@ -82,9 +117,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       const regex = new RegExp(`(^|\s)${tag}($|\s)`, 'i');
       
       if (regex.test(cleanString)) {
+        log(`Match Found! Tag: ${tag} (${s.name})`);
         targetShortcut = s;
         // Remove the tag from the query and trim whitespace
         finalQuery = cleanString.replace(regex, " ").trim();
+        log("New query after stripping tag:", finalQuery);
         break; 
       }
     }
@@ -94,8 +131,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       const encodedQuery = encodeURIComponent(finalQuery);
       finalUrl = finalUrl.replace("{q}", encodedQuery);
       
-      console.log(`[Pandorian] Redirecting to ${targetShortcut.name}`);
+      log(`Redirecting to: ${finalUrl}`);
       chrome.tabs.update(tabId, { url: finalUrl });
+    } else {
+        log("No matching shortcut tag found.");
     }
 
   } catch (e) {

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pandorian Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="brand-text">
+                    <h1>Pandorian</h1>
+                    <p>Command Center</p>
+                </div>
+            </div>
+            <div class="toggle-wrapper">
+                <span style="font-size: 13px; font-weight: 600;">ACTIVE</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="globalToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </header>
+
+        <main>
+            <!-- Creator -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">New Shortcut</span>
+                </div>
+                <form id="addForm">
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 0.4;">
+                            <label>TRIGGER</label>
+                            <input type="text" id="newKey" placeholder="e.g. g" required autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label>NAME</label>
+                            <input type="text" id="newName" placeholder="e.g. Genius" required autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>DESTINATION URL (Use {q} for search term)</label>
+                        <input type="url" id="newUrl" placeholder="https://genius.com/search?q={q}" required autocomplete="off">
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="submit" class="btn btn-accent">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Create Shortcut
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- List -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Your Shortcuts</span>
+                    <span id="countBadge" style="background:#333; padding:2px 8px; border-radius:4px; font-size:12px;">0</span>
+                </div>
+                <div id="shortcutsList" class="shortcut-list">
+                    <!-- JS Injects Here -->
+                </div>
+            </div>
+        </main>
+
+        <footer style="text-align: center; margin-top: 50px; border-top: 1px solid var(--border-color); padding-top: 30px;">
+            <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 20px;">
+                <a href="https://buymeacoffee.com/galore" target="_blank" class="btn btn-primary" style="background:#FFDD00; color:black;">
+                    ☕ Support Dev
+                </a>
+                <a href="https://github.com/nicholasxdavis/pandorian" target="_blank" class="btn btn-subtle">
+                    GitHub Repo
+                </a>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted);">Pandorian v1.1 • Built for Speed</p>
+        </footer>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html>

@@ -1,40 +1,26 @@
-// Pandorian Core Logic - Enhanced Edition
+// Pandorian Core Logic v2.0 - Bulletproof Edition
 
 const DEFAULT_SHORTCUTS = [
-  { key: "s", url: "https://open.spotify.com/search/{q}", name: "Spotify", category: "Music", icon: "🎵" },
-  { key: "g", url: "https://genius.com/search?q={q}", name: "Genius", category: "Music", icon: "🎤" },
-  { key: "r", url: "https://www.reddit.com/search/?q={q}", name: "Reddit", category: "Social", icon: "🤖" },
-  { key: "yt", url: "https://www.youtube.com/results?search_query={q}", name: "YouTube", category: "Video", icon: "▶️" },
-  { key: "x", url: "https://twitter.com/search?q={q}", name: "X (Twitter)", category: "Social", icon: "🐦" },
-  { key: "gh", url: "https://github.com/search?q={q}", name: "GitHub", category: "Development", icon: "💻" },
-  { key: "amz", url: "https://www.amazon.com/s?k={q}", name: "Amazon", category: "Shopping", icon: "🛒" }
+  { key: "s", url: "https://open.spotify.com/search/{q}", name: "Spotify" },
+  { key: "g", url: "https://genius.com/search?q={q}", name: "Genius" },
+  { key: "r", url: "https://www.reddit.com/search/?q={q}", name: "Reddit" },
+  { key: "yt", url: "https://www.youtube.com/results?search_query={q}", name: "YouTube" },
+  { key: "x", url: "https://twitter.com/search?q={q}", name: "X (Twitter)" },
+  { key: "gh", url: "https://github.com/search?q={q}", name: "GitHub" },
+  { key: "amz", url: "https://www.amazon.com/s?k={q}", name: "Amazon" }
 ];
 
 let shortcutsCache = DEFAULT_SHORTCUTS;
 let isEnabled = true;
-let searchHistory = [];
-let analytics = { totalSearches: 0, shortcutsUsed: {} };
-
-// Fuzzy search helper
-function fuzzyMatch(pattern, str) {
-  pattern = pattern.toLowerCase();
-  str = str.toLowerCase();
-  let patternIdx = 0;
-  for (let i = 0; i < str.length && patternIdx < pattern.length; i++) {
-    if (str[i] === pattern[patternIdx]) patternIdx++;
-  }
-  return patternIdx === pattern.length;
-}
 
 function log(msg, ...args) {
-    if (chrome.runtime.getManifest().version.includes('dev')) {
-        console.log(`[Pandorian] ${msg}`, ...args);
-    }
+    console.log(`[Pandorian] ${msg}`, ...args);
 }
 
-// Load data with analytics and history
+// --- DATA MANAGEMENT ---
+
 function refreshData() {
-  chrome.storage.sync.get(["shortcuts", "enabled", "searchHistory", "analytics"], (data) => {
+  chrome.storage.sync.get(["shortcuts", "enabled"], (data) => {
     if (data.shortcuts) {
       shortcutsCache = data.shortcuts;
     } else {
@@ -43,145 +29,115 @@ function refreshData() {
     if (data.enabled !== undefined) {
       isEnabled = data.enabled;
     }
-    if (data.searchHistory) {
-      searchHistory = data.searchHistory.slice(0, 50); // Keep last 50
-    }
-    if (data.analytics) {
-      analytics = { ...analytics, ...data.analytics };
-    }
   });
 }
 
-// Track analytics
-function trackUsage(shortcutKey, query) {
-  analytics.totalSearches++;
-  analytics.shortcutsUsed[shortcutKey] = (analytics.shortcutsUsed[shortcutKey] || 0) + 1;
-  
-  searchHistory.unshift({
-    key: shortcutKey,
-    query: query.substring(0, 100),
-    timestamp: Date.now()
-  });
-  searchHistory = searchHistory.slice(0, 50);
-  
-  chrome.storage.sync.set({ analytics, searchHistory });
-}
-
-chrome.runtime.onInstalled.addListener(() => {
-    refreshData();
-    chrome.storage.sync.set({ shortcuts: DEFAULT_SHORTCUTS });
-});
-
-chrome.runtime.onStartup.addListener(() => {
-    refreshData();
-});
-
+chrome.runtime.onInstalled.addListener(refreshData);
+chrome.runtime.onStartup.addListener(refreshData);
 refreshData();
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync') {
-    if (changes.shortcuts) {
-        shortcutsCache = changes.shortcuts.newValue;
-    }
-    if (changes.enabled) {
-        isEnabled = changes.enabled.newValue;
-    }
+    if (changes.shortcuts) shortcutsCache = changes.shortcuts.newValue;
+    if (changes.enabled) isEnabled = changes.enabled.newValue;
   }
 });
 
-// Keyboard commands
-chrome.commands.onCommand.addListener((command) => {
-  if (command === 'open-command-palette') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id, { action: 'openPalette' });
-    });
-  }
-});
+// --- URL PARSING (The 100x Improvement) ---
 
-// Enhanced URL parsing
-function getSearchQuery(urlObj) {
-  try {
-    const h = urlObj.hostname.toLowerCase();
-    if (h.includes("google") || h.includes("bing") || h.includes("ecosia") || h.includes("duckduckgo")) {
-      return urlObj.searchParams.get("q") || urlObj.searchParams.get("query");
+function processUrl(tabId, urlString) {
+    if (!isEnabled || !urlString.startsWith('http')) return;
+
+    // Check if it's a search URL (simple heuristic to save performance)
+    if (!urlString.includes('q=') && !urlString.includes('query=') && !urlString.includes('p=')) return;
+
+    try {
+        const urlObj = new URL(urlString);
+        const h = urlObj.hostname;
+        let rawQuery = null;
+
+        // Supported Engines Logic
+        if (h.includes("google") || h.includes("bing") || h.includes("ecosia") || h.includes("duckduckgo")) {
+            rawQuery = urlObj.searchParams.get("q") || urlObj.searchParams.get("query");
+        } else if (h.includes("yahoo")) {
+            rawQuery = urlObj.searchParams.get("p");
+        }
+
+        if (!rawQuery) return;
+
+        log("Analyzing Query:", rawQuery);
+
+        // 1. Normalize: Replace + with space, then decode URI
+        //    "drake+%40g" -> "drake @g"
+        let cleanString = decodeURIComponent(rawQuery.replace(/\+/g, ' '));
+        
+        // 2. TOKENIZE: Split by spaces to find the @tag
+        //    "drake @g" -> ["drake", "@g"]
+        const tokens = cleanString.split(/\s+/); // Split by any whitespace
+
+        let matchedShortcut = null;
+        let matchedTokenIndex = -1;
+
+        // 3. FIND MATCH
+        for (let i = 0; i < tokens.length; i++) {
+            const token = tokens[i];
+            
+            // Check if token matches any shortcut key (case insensitive)
+            // We check if token starts with @
+            if (token.startsWith('@')) {
+                 const key = token.substring(1).toLowerCase(); // remove @
+                 const found = shortcutsCache.find(s => s.key.toLowerCase() === key);
+                 if (found) {
+                     matchedShortcut = found;
+                     matchedTokenIndex = i;
+                     break; // Stop at first valid tag found
+                 }
+            }
+        }
+
+        if (matchedShortcut) {
+            log(`Found Shortcut: ${matchedShortcut.name} (@${matchedShortcut.key})`);
+            
+            // 4. REMOVE TAG
+            // Remove the specific token that triggered the match
+            tokens.splice(matchedTokenIndex, 1);
+            
+            // Rejoin remaining text
+            const finalQuery = tokens.join(' ').trim();
+            
+            // 5. REDIRECT
+            let finalUrl = matchedShortcut.url;
+            // If shortcut URL has {q}, encode remaining query
+            // If query is empty (user just typed @s), handle gracefully (maybe go to home page?)
+            if (finalQuery.length === 0) {
+                 // Option: if {q} is at the end, just remove it? Or send empty?
+                 // Let's send empty string, sites usually handle it (like search home)
+                 finalUrl = finalUrl.replace("{q}", "");
+            } else {
+                 finalUrl = finalUrl.replace("{q}", encodeURIComponent(finalQuery));
+            }
+
+            log(`Redirecting to: ${finalUrl}`);
+            chrome.tabs.update(tabId, { url: finalUrl });
+        }
+
+    } catch (e) {
+        // Silent fail on parse errors
     }
-    if (h.includes("yahoo")) {
-      return urlObj.searchParams.get("p");
-    }
-  } catch (e) { return null; }
-  return null;
 }
 
-// Enhanced navigation handler with better matching
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  const currentUrl = changeInfo.url || tab.url;
-  
-  if (!currentUrl || !isEnabled || !currentUrl.startsWith('http')) return;
-  if (changeInfo.status !== 'loading') return; // Only process on navigation start
+// --- DUAL LISTENERS FOR SPEED & RELIABILITY ---
 
-  if (!currentUrl.includes('q=') && !currentUrl.includes('query=') && !currentUrl.includes('p=')) {
-      return;
-  }
-
-  try {
-    const urlObj = new URL(currentUrl);
-    const rawQuery = getSearchQuery(urlObj);
-    
-    if (!rawQuery) return;
-
-    let cleanString = rawQuery.replace(/\+/g, ' ');
-    cleanString = decodeURIComponent(cleanString);
-
-    let targetShortcut = null;
-    let finalQuery = cleanString;
-    let bestMatch = null;
-    let bestScore = 0;
-
-    // Try exact match first (fastest)
-    for (const s of shortcutsCache) {
-      const tag = "@" + s.key;
-      const regex = new RegExp(`(^|\s)${tag.replace(/[.*+?^${}()|[\]\]/g, '\$&')}($|\s)`, 'i');
-      
-      if (regex.test(cleanString)) {
-        targetShortcut = s;
-        finalQuery = cleanString.replace(regex, " ").trim();
-        break;
-      }
-      
-      // Fuzzy matching for typos
-      if (fuzzyMatch(s.key, cleanString) && s.key.length > bestScore) {
-        bestMatch = s;
-        bestScore = s.key.length;
-      }
+// Listener 1: webNavigation (Faster, catches it before DOM load)
+chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+    if (details.frameId === 0) { // Main frame only
+        processUrl(details.tabId, details.url);
     }
-
-    // If no exact match but fuzzy match found, use it (optional feature)
-    // if (!targetShortcut && bestMatch) {
-    //   targetShortcut = bestMatch;
-    // }
-
-    if (targetShortcut) {
-      let finalUrl = targetShortcut.url;
-      const encodedQuery = encodeURIComponent(finalQuery || " ");
-      finalUrl = finalUrl.replace("{q}", encodedQuery);
-      
-      trackUsage(targetShortcut.key, finalQuery);
-      chrome.tabs.update(tabId, { url: finalUrl });
-    }
-
-  } catch (e) {
-    console.error("[Pandorian Error]", e);
-  }
 });
 
-// Message handler for popup/options communication
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'getShortcuts') {
-    sendResponse({ shortcuts: shortcutsCache, enabled: isEnabled });
-  } else if (request.action === 'getHistory') {
-    sendResponse({ history: searchHistory.slice(0, 20) });
-  } else if (request.action === 'getAnalytics') {
-    sendResponse({ analytics });
-  }
-  return true;
+// Listener 2: tabs.onUpdated (Reliable fallback)
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.url) {
+        processUrl(tabId, changeInfo.url);
+    }
 });

@@ -2,20 +2,14 @@
   "manifest_version": 3,
   "name": "Pandorian",
   "version": "2.0.0",
-  "description": "The ultimate command bar for your browser. Use @tags to navigate instantly with advanced features.",
+  "description": "The ultimate command bar for your browser. Use @tags to navigate instantly.",
   "permissions": [
     "storage",
     "tabs",
-    "webNavigation",
-    "history"
+    "webNavigation"
   ],
   "host_permissions": [
-    "*://www.google.com/*",
-    "*://www.google.*/*",
-    "*://www.bing.com/*",
-    "*://duckduckgo.com/*",
-    "*://search.yahoo.com/*",
-    "*://www.ecosia.org/*"
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
@@ -29,22 +23,6 @@
     }
   },
   "options_page": "options.html",
-  "commands": {
-    "open-command-palette": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+P",
-        "mac": "Command+Shift+P"
-      },
-      "description": "Open Pandorian Command Palette"
-    },
-    "quick-search": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+K",
-        "mac": "Command+Shift+K"
-      },
-      "description": "Quick Search with Pandorian"
-    }
-  },
   "icons": {
     "16": "img/logo.png",
     "48": "img/logo.png",

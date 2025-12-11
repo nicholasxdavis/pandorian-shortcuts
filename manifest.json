@@ -2,14 +2,50 @@
   "manifest_version": 3,
   "name": "Pandorian",
   "version": "2.0.0",
-  "description": "The ultimate command bar for your browser. Use @tags to navigate instantly.",
+  "description": "The ultimate command bar for your browser. Use @tags to navigate instantly. Search any site with custom shortcuts.",
+  "author": "Pandorian Team",
   "permissions": [
     "storage",
     "tabs",
-    "webNavigation"
+    "webNavigation",
+    "omnibox"
   ],
   "host_permissions": [
     "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://www.google.com/*",
+        "*://www.google.co.uk/*",
+        "*://www.google.ca/*",
+        "*://www.google.com.au/*",
+        "*://www.google.de/*",
+        "*://www.google.fr/*",
+        "*://www.google.it/*",
+        "*://www.google.es/*",
+        "*://www.google.co.jp/*",
+        "*://www.google.com.br/*",
+        "*://www.google.in/*",
+        "*://www.google.ru/*",
+        "*://www.google.co.kr/*",
+        "*://www.google.com.mx/*",
+        "*://www.google.com.tr/*",
+        "*://www.bing.com/*",
+        "*://duckduckgo.com/*",
+        "*://www.duckduckgo.com/*",
+        "*://search.yahoo.com/*",
+        "*://www.yahoo.com/*",
+        "*://yandex.com/*",
+        "*://www.yandex.com/*",
+        "*://yandex.ru/*",
+        "*://www.baidu.com/*",
+        "*://www.ecosia.org/*"
+      ],
+      "js": ["content-script.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
   ],
   "background": {
     "service_worker": "background.js"
@@ -20,12 +56,44 @@
       "16": "img/logo.png",
       "48": "img/logo.png",
       "128": "img/logo.png"
-    }
+    },
+    "default_title": "Pandorian - Command Bar"
   },
   "options_page": "options.html",
   "icons": {
     "16": "img/logo.png",
     "48": "img/logo.png",
     "128": "img/logo.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "commands": {
+    "open-command-palette": {
+      "suggested_key": {
+        "default": "Ctrl+K",
+        "mac": "Command+K"
+      },
+      "description": "Open Pandorian Command Palette"
+    },
+    "generate-qr-code": {
+      "suggested_key": {
+        "default": "Ctrl+Q",
+        "mac": "Ctrl+Shift+Q"
+      },
+      "description": "Generate QR code for current page"
+    },
+    "quick-shortcut-1": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+1"
+      },
+      "description": "Quick Shortcut 1"
+    },
+    "quick-shortcut-2": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+2"
+      },
+      "description": "Quick Shortcut 2"
+    }
   }
 }

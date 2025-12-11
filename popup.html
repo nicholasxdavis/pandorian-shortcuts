@@ -2,34 +2,100 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pandorian</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="popup-body">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <div style="display:flex; align-items:center;">
+    <div class="popup-logo-container">
+        <img src="img/logo.png" alt="Pandorian Logo" class="popup-logo">
+    </div>
+    <div class="popup-header">
+        <div class="popup-brand">
             <span id="statusDot" class="status-indicator"></span>
-            <span style="font-weight:700; font-size:16px;">Pandorian</span>
+            <div>
+                <span class="popup-title">Pandorian</span>
+                <span class="popup-byline">by Blacnova</span>
+                <span id="statusText" class="status-text active">Active</span>
+            </div>
         </div>
-        <div style="font-size:10px; opacity:0.5;">v2.0</div>
+        <button id="btnHeaderOptions" class="btn-header-options" title="Open Options" aria-label="Open Options">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+        </button>
     </div>
 
-    <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid var(--border-color);">
-        <p style="margin:0; font-size:12px; color:var(--text-muted); line-height:1.5;">
-            Type <strong style="color:var(--accent-glow)">drake @g</strong> in your address bar to search Genius.
-        </p>
-    </div>
-
-    <div style="display:flex; flex-direction:column; gap:10px;">
-        <button id="btnOptions" class="btn btn-accent" style="width:100%">Manage Shortcuts</button>
-        <label class="btn btn-subtle" style="width:100%; justify-content:space-between; padding:10px 15px; cursor:pointer;">
+    <div class="popup-toggle-section">
+        <label class="popup-toggle-label">
             <span>Extension Enabled</span>
-            <div class="toggle-switch" style="transform:scale(0.8);">
-                <input type="checkbox" id="popupToggle">
+            <div class="toggle-switch toggle-small">
+                <input type="checkbox" id="popupToggle" aria-label="Toggle extension">
                 <span class="slider"></span>
             </div>
         </label>
     </div>
+
+    <div class="popup-info">
+        <p class="popup-info-text">
+            Type <strong class="highlight">drake @g</strong> in any search engine to search Genius instantly.
+        </p>
+        <p class="popup-info-subtext">
+            <span id="shortcutsCount" class="count-badge">0</span> shortcuts configured
+        </p>
+        <p class="popup-keyboard-hint">
+            Press <kbd>Ctrl+K</kbd> to open Command Palette
+        </p>
+    </div>
+
+    <div class="popup-actions">
+        <button id="btnOptions" class="btn btn-accent btn-full">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            Manage Shortcuts
+        </button>
+        <button id="btnQRCode" class="btn btn-subtle btn-full btn-qr-with-text" title="QR to Mobile - Generate QR code for current page">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="5" height="5"></rect>
+                <rect x="16" y="3" width="5" height="5"></rect>
+                <rect x="3" y="16" width="5" height="5"></rect>
+                <path d="M21 16h-3a2 2 0 0 0-2 2v3"></path>
+                <path d="M16 12h.01"></path>
+                <path d="M12 12h.01"></path>
+                <path d="M12 16h.01"></path>
+                <path d="M12 20h.01"></path>
+                <path d="M16 16h.01"></path>
+                <path d="M20 12h.01"></path>
+            </svg>
+            <span class="qr-button-text">to Mobile</span>
+        </button>
+    </div>
+
+    <div class="popup-footer">
+        <p class="popup-hint">
+            <kbd>Enter</kbd> or <kbd>Ctrl+O</kbd> to open options
+        </p>
+        <p class="popup-branding">Pandorian by Blacnova</p>
+        <p class="popup-location">Developed in the United States</p>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="qr-modal" style="display: none;">
+        <div class="qr-modal-content">
+            <div class="qr-modal-header">
+                <h3>Scan to open on mobile</h3>
+                <button id="qrModalClose" class="qr-modal-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="qr-modal-body">
+                <div id="qrCodeContainer"></div>
+                <p class="qr-modal-url" id="qrModalUrl"></p>
+            </div>
+        </div>
+    </div>
+
     <script src="popup.js"></script>
 </body>
 </html>

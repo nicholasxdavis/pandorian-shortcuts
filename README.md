@@ -1,4 +1,4 @@
-![Pandorian Header](https://github.com/nicholasxdavis/pandorian-shortcuts/blob/main/img/logo.png?raw=true)
+![Pandorian Header]
 
 # Pandorian - A Shortcut
 

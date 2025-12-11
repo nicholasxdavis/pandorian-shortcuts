@@ -236,11 +236,3 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ---
-
-## Star History
-
-![Star History Chart](https://api.star-history.com/svg?repos=nicholasxdavis/pandorian-shortcuts\&type=Date)
-
----
-
-**Made for developers and power users who want to navigate the web faster.**

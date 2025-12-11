@@ -26,7 +26,11 @@
         exportBtn: null,
         importBtn: null,
         importInput: null,
-        clearBtn: null
+        clearBtn: null,
+        bookmarksList: null,
+        bookmarksCountBadge: null,
+        bookmarkSearchInput: null,
+        addBookmarkBtn: null
     };
 
     /**
@@ -36,7 +40,9 @@
         try {
             initializeElements();
             attachEventListeners();
+            attachBookmarkSettingsListeners();
             loadData();
+            loadBookmarkSidebarSetting();
         } catch (error) {
             console.error('[Pandorian] Initialization error:', error);
             showToast('Failed to initialize', 'error');
@@ -59,6 +65,7 @@
         elements.importBtn = document.getElementById('importBtn');
         elements.importInput = document.getElementById('importInput');
         elements.clearBtn = document.getElementById('clearBtn');
+        elements.bookmarksSidebarToggle = document.getElementById('bookmarksSidebarToggle');
     }
 
     /**
@@ -86,6 +93,11 @@
         
         if (elements.clearBtn) {
             elements.clearBtn.addEventListener('click', handleClearAll);
+        }
+
+        // Bookmark sidebar toggle
+        if (elements.bookmarksSidebarToggle) {
+            elements.bookmarksSidebarToggle.addEventListener('change', handleBookmarksSidebarToggle);
         }
 
         // Show tour button
@@ -916,6 +928,380 @@
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
         }, 3000);
+    }
+
+    /**
+     * Handle bookmarks sidebar toggle
+     */
+    function handleBookmarksSidebarToggle(e) {
+        chrome.storage.sync.set({ bookmarksEnabled: e.target.checked }, () => {
+            if (chrome.runtime.lastError) {
+                console.error('[Pandorian] Failed to save bookmark sidebar setting:', chrome.runtime.lastError);
+                elements.bookmarksSidebarToggle.checked = !e.target.checked;
+                showToast('Failed to save settings', 'error');
+            } else {
+                showToast(e.target.checked ? 'Bookmark sidebar enabled' : 'Bookmark sidebar disabled', 'success');
+            }
+        });
+    }
+
+    /**
+     * Load bookmark sidebar setting
+     */
+    function loadBookmarkSidebarSetting() {
+        chrome.storage.sync.get([
+            'bookmarksEnabled',
+            'bookmarkFoldersCollapsedByDefault',
+            'bookmarkTheme',
+            'bookmarkShowCount',
+            'bookmarkEnableDragDrop',
+            'bookmarkShowSearch',
+            'bookmarkCompactMode',
+            'bookmarkAccentColor'
+        ], (result) => {
+            if (elements.bookmarksSidebarToggle) {
+                elements.bookmarksSidebarToggle.checked = result.bookmarksEnabled !== false;
+            }
+            
+            // Load all bookmark settings
+            const bookmarkFoldersCollapsed = document.getElementById('bookmarkFoldersCollapsedByDefault');
+            if (bookmarkFoldersCollapsed) {
+                bookmarkFoldersCollapsed.checked = result.bookmarkFoldersCollapsedByDefault !== false;
+            }
+            
+            // Load theme
+            renderBookmarkThemes(result.bookmarkTheme || 'black');
+            
+            const showCount = document.getElementById('bookmarkShowCount');
+            if (showCount) {
+                showCount.checked = result.bookmarkShowCount !== false;
+            }
+            
+            const enableDragDrop = document.getElementById('bookmarkEnableDragDrop');
+            if (enableDragDrop) {
+                enableDragDrop.checked = result.bookmarkEnableDragDrop !== false;
+            }
+            
+            const showSearch = document.getElementById('bookmarkShowSearch');
+            if (showSearch) {
+                showSearch.checked = result.bookmarkShowSearch !== false;
+            }
+            
+            const compactMode = document.getElementById('bookmarkCompactMode');
+            if (compactMode) {
+                compactMode.checked = result.bookmarkCompactMode === true;
+            }
+
+            // Load accent color
+            const accentColor = document.getElementById('bookmarkAccentColor');
+            if (accentColor) {
+                accentColor.value = result.bookmarkAccentColor || '#8b5cf6';
+            }
+        });
+    }
+
+    /**
+     * Render bookmark themes (white and black background themes)
+     */
+    function renderBookmarkThemes(selectedTheme) {
+        const themeGrid = document.getElementById('bookmarkThemeGrid');
+        if (!themeGrid) return;
+
+        const themes = {
+            black: { name: 'Black', bgColor: '#141414', textColor: '#ffffff' },
+            white: { name: 'White', bgColor: '#ffffff', textColor: '#000000' }
+        };
+
+        themeGrid.innerHTML = '';
+        
+        Object.keys(themes).forEach(themeKey => {
+            const theme = themes[themeKey];
+            const option = document.createElement('div');
+            option.className = `bookmark-theme-option ${selectedTheme === themeKey ? 'selected' : ''}`;
+            option.setAttribute('data-theme', themeKey);
+            option.setAttribute('title', theme.name);
+            
+            const colorPreview = document.createElement('div');
+            colorPreview.className = 'bookmark-theme-color-preview';
+            colorPreview.style.backgroundColor = theme.bgColor;
+            colorPreview.style.borderColor = themeKey === 'white' ? '#e0e0e0' : '#333';
+            
+            const label = document.createElement('span');
+            label.textContent = theme.name;
+            
+            option.appendChild(colorPreview);
+            option.appendChild(label);
+            
+            option.addEventListener('click', () => {
+                chrome.storage.sync.set({ bookmarkTheme: themeKey }, () => {
+                    renderBookmarkThemes(themeKey);
+                    showToast('Theme updated', 'success');
+                });
+            });
+            
+            themeGrid.appendChild(option);
+        });
+    }
+
+    /**
+     * Attach bookmark settings event listeners
+     */
+    function attachBookmarkSettingsListeners() {
+        // Auto-collapse folders
+        const bookmarkFoldersCollapsed = document.getElementById('bookmarkFoldersCollapsedByDefault');
+        if (bookmarkFoldersCollapsed) {
+            bookmarkFoldersCollapsed.addEventListener('change', (e) => {
+                chrome.storage.sync.set({ bookmarkFoldersCollapsedByDefault: e.target.checked }, () => {
+                    showToast(e.target.checked ? 'Folders will auto-collapse' : 'Folders will remain expanded', 'success');
+                });
+            });
+        }
+
+        // Accent color
+        const accentColor = document.getElementById('bookmarkAccentColor');
+        const colorPreview = document.getElementById('bookmarkColorPreview');
+        const colorValue = document.getElementById('bookmarkColorValue');
+        
+        // Load current accent color
+        chrome.storage.sync.get(['bookmarkAccentColor'], (result) => {
+            const currentColor = result.bookmarkAccentColor || '#8b5cf6';
+            if (accentColor) accentColor.value = currentColor;
+            if (colorPreview) colorPreview.style.background = currentColor;
+            if (colorValue) colorValue.textContent = currentColor.toUpperCase();
+        });
+        
+        if (accentColor) {
+            accentColor.addEventListener('input', (e) => {
+                const color = e.target.value;
+                if (colorPreview) colorPreview.style.background = color;
+                if (colorValue) colorValue.textContent = color.toUpperCase();
+            });
+            
+            accentColor.addEventListener('change', (e) => {
+                chrome.storage.sync.set({ bookmarkAccentColor: e.target.value }, () => {
+                    showToast('Accent color updated', 'success');
+                });
+            });
+        }
+        
+        // Click preview to open color picker
+        if (colorPreview && accentColor) {
+            colorPreview.addEventListener('click', () => {
+                accentColor.click();
+            });
+        }
+
+        // Show count
+        const showCount = document.getElementById('bookmarkShowCount');
+        if (showCount) {
+            showCount.addEventListener('change', (e) => {
+                chrome.storage.sync.set({ bookmarkShowCount: e.target.checked }, () => {
+                    showToast('Setting saved', 'success');
+                });
+            });
+        }
+
+        // Enable drag & drop
+        const enableDragDrop = document.getElementById('bookmarkEnableDragDrop');
+        if (enableDragDrop) {
+            enableDragDrop.addEventListener('change', (e) => {
+                chrome.storage.sync.set({ bookmarkEnableDragDrop: e.target.checked }, () => {
+                    showToast('Setting saved', 'success');
+                });
+            });
+        }
+
+        // Show search
+        const showSearch = document.getElementById('bookmarkShowSearch');
+        if (showSearch) {
+            showSearch.addEventListener('change', (e) => {
+                chrome.storage.sync.set({ bookmarkShowSearch: e.target.checked }, () => {
+                    showToast('Setting saved', 'success');
+                });
+            });
+        }
+
+        // Compact mode
+        const compactMode = document.getElementById('bookmarkCompactMode');
+        if (compactMode) {
+            compactMode.addEventListener('change', (e) => {
+                chrome.storage.sync.set({ bookmarkCompactMode: e.target.checked }, () => {
+                    showToast('Setting saved', 'success');
+                });
+            });
+        }
+
+        // Load hidden bookmarks and sidebar visibility
+        loadHiddenBookmarks();
+        loadHiddenWebsites();
+        loadSidebarVisibility();
+        
+        // Show sidebar button
+        const showSidebarBtn = document.getElementById('showSidebarBtn');
+        if (showSidebarBtn) {
+            showSidebarBtn.addEventListener('click', () => {
+                chrome.storage.sync.set({ 
+                    sidebarHiddenUntil: null,
+                    sidebarHiddenPermanent: false
+                }, () => {
+                    showToast('Sidebar will be visible again', 'success');
+                    loadSidebarVisibility();
+                });
+            });
+        }
+
+        // Listen for changes to hidden bookmarks and websites
+        chrome.storage.onChanged.addListener((changes) => {
+            if (changes.hiddenBookmarks) {
+                loadHiddenBookmarks();
+            }
+            if (changes.sidebarHiddenWebsites) {
+                loadHiddenWebsites();
+            }
+            if (changes.sidebarHiddenUntil || changes.sidebarHiddenPermanent) {
+                loadSidebarVisibility();
+            }
+        });
+    }
+
+    /**
+     * Load and display hidden bookmarks
+     */
+    function loadHiddenBookmarks() {
+        const hiddenBookmarksList = document.getElementById('hiddenBookmarksList');
+        if (!hiddenBookmarksList) return;
+
+        chrome.storage.sync.get(['hiddenBookmarks'], (result) => {
+            const hiddenIds = result.hiddenBookmarks || [];
+            
+            if (hiddenIds.length === 0) {
+                hiddenBookmarksList.innerHTML = '<p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">No hidden bookmarks</p>';
+                return;
+            }
+
+            // Fetch bookmark details
+            Promise.all(hiddenIds.map(id => {
+                return new Promise((resolve) => {
+                    chrome.bookmarks.get(id, (bookmarks) => {
+                        resolve(bookmarks && bookmarks.length > 0 ? bookmarks[0] : null);
+                    });
+                });
+            })).then(bookmarks => {
+                const validBookmarks = bookmarks.filter(b => b !== null);
+                
+                if (validBookmarks.length === 0) {
+                    hiddenBookmarksList.innerHTML = '<p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">No hidden bookmarks</p>';
+                    return;
+                }
+
+                hiddenBookmarksList.innerHTML = validBookmarks.map(bookmark => `
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: var(--bg-input); border-radius: 8px; margin-bottom: 8px;">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${escapeHtml(bookmark.title)}
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${escapeHtml(bookmark.url)}
+                            </div>
+                        </div>
+                        <button class="btn btn-subtle" data-bookmark-id="${bookmark.id}" style="margin-left: 10px; padding: 6px 12px; font-size: 12px;" title="Unhide bookmark">
+                            Show
+                        </button>
+                    </div>
+                `).join('');
+
+                // Add click handlers for unhide buttons
+                hiddenBookmarksList.querySelectorAll('[data-bookmark-id]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const bookmarkId = e.target.getAttribute('data-bookmark-id');
+                        unhideBookmark(bookmarkId);
+                    });
+                });
+            });
+        });
+    }
+
+    /**
+     * Unhide a bookmark
+     */
+    function unhideBookmark(bookmarkId) {
+        chrome.storage.sync.get(['hiddenBookmarks'], (result) => {
+            const hidden = new Set(result.hiddenBookmarks || []);
+            hidden.delete(bookmarkId);
+            
+            chrome.storage.sync.set({ hiddenBookmarks: Array.from(hidden) }, () => {
+                if (chrome.runtime.lastError) {
+                    showToast('Failed to unhide bookmark', 'error');
+                    return;
+                }
+                
+                showToast('Bookmark unhidden', 'success');
+                loadHiddenBookmarks();
+            });
+        });
+    }
+
+    /**
+     * Load and display sidebar visibility status
+     */
+    function loadSidebarVisibility() {
+        const sidebarVisibilityStatus = document.getElementById('sidebarVisibilityStatus');
+        const showSidebarBtn = document.getElementById('showSidebarBtn');
+        if (!sidebarVisibilityStatus) return;
+
+        chrome.storage.sync.get(['sidebarHiddenUntil', 'sidebarHiddenPermanent'], (result) => {
+            if (result.sidebarHiddenPermanent) {
+                sidebarVisibilityStatus.innerHTML = `
+                    <p style="margin: 0; color: var(--text-main);">
+                        <strong style="color: var(--danger);">Sidebar is hidden permanently</strong>
+                    </p>
+                    <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-muted);">
+                        Right-click empty space in the sidebar and select "Hide sidebar permanently" to hide it.
+                    </p>
+                `;
+                if (showSidebarBtn) showSidebarBtn.style.display = 'block';
+            } else if (result.sidebarHiddenUntil) {
+                const now = Date.now();
+                const timeLeft = result.sidebarHiddenUntil - now;
+                
+                if (timeLeft > 0) {
+                    const minutes = Math.ceil(timeLeft / (60 * 1000));
+                    sidebarVisibilityStatus.innerHTML = `
+                        <p style="margin: 0; color: var(--text-main);">
+                            <strong style="color: var(--accent-glow);">Sidebar is hidden for ${minutes} more minute${minutes !== 1 ? 's' : ''}</strong>
+                        </p>
+                        <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-muted);">
+                            The sidebar will automatically appear again when the time expires.
+                        </p>
+                    `;
+                    if (showSidebarBtn) showSidebarBtn.style.display = 'block';
+                } else {
+                    // Time expired
+                    chrome.storage.sync.set({ sidebarHiddenUntil: null }, () => {
+                        loadSidebarVisibility();
+                    });
+                }
+            } else {
+                sidebarVisibilityStatus.innerHTML = `
+                    <p style="margin: 0; color: var(--text-main);">
+                        <strong style="color: var(--accent-glow);">Sidebar is visible</strong>
+                    </p>
+                    <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-muted);">
+                        Right-click empty space in the sidebar to hide it temporarily or permanently.
+                    </p>
+                `;
+                if (showSidebarBtn) showSidebarBtn.style.display = 'none';
+            }
+        });
+    }
+
+    /**
+     * Escape HTML
+     */
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     // Initialize when DOM is ready

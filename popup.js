@@ -255,7 +255,7 @@
         if (isEnabled) {
             elements.dot.classList.remove('off');
             if (elements.statusText) {
-                elements.statusText.textContent = 'Active';
+                elements.statusText.textContent = 'Enabled';
                 elements.statusText.className = 'status-text active';
             }
         } else {

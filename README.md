@@ -1,5 +1,3 @@
-![Pandorian Header](https://raw.githubusercontent.com/nicholasxdavis/pandorian-shortcuts/main/img/logo.png)
-
 # Pandorian - A Shortcut
 
 ![Pandorian Logo](https://img.shields.io/badge/Pandorian-Browser%20Extension-purple) ![Chrome](https://img.shields.io/badge/platform-Chrome%20%7C%20Edge-blue) ![License](https://img.shields.io/badge/license-MIT-green)

@@ -13,8 +13,8 @@
                     <img src="img/logo.png" alt="Pandorian Logo" class="brand-logo">
                 </div>
                 <div class="brand-text">
-                    <h1>Pandorian</h1>
-                    <p>by Blacnova</p>
+                    
+                    
                 </div>
             </div>
             <div class="header-actions">
@@ -111,152 +111,32 @@
                 </div>
             </div>
 
-            <!-- Bookmark Settings -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Bookmark Sidebar</span>
-                    <span class="new-pill">NEW</span>
-                </div>
-                <div style="padding: 20px;">
-                    <div style="margin-bottom: 20px;">
-                        <label class="popup-toggle-label" style="margin: 0;">
-                            <span>Enable Bookmark Sidebar</span>
-                            <div class="toggle-switch toggle-small">
-                                <input type="checkbox" id="bookmarksSidebarToggle">
-                                <span class="slider"></span>
-                            </div>
-                        </label>
-                        <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-                            Hover over the left edge of any webpage to access your bookmarks.
-                        </p>
-                    </div>
-
-                    <div class="settings-section" style="margin-bottom: 20px;">
-                        <label class="popup-toggle-label" style="margin: 0;">
-                            <span>Auto-collapse Folders</span>
-                            <div class="toggle-switch toggle-small">
-                                <input type="checkbox" id="bookmarkFoldersCollapsedByDefault">
-                                <span class="slider"></span>
-                            </div>
-                        </label>
-                        <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-muted);">
-                            Folders will be collapsed by default. Click to expand and see bookmarks.
-                        </p>
-                    </div>
-
-                    <div class="settings-section">
-                        <label class="settings-section-title">
-                            Background Theme
-                        </label>
-                        <div class="bookmark-theme-selector" id="bookmarkThemeGrid">
-                            <!-- Themes injected by JS -->
-                        </div>
-                        <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-muted);">
-                            Choose the background color for the bookmark sidebar.
-                        </p>
-                    </div>
-
-                    <div class="settings-section">
-                        <label class="settings-section-title">
-                            Accent Color
-                        </label>
-                        <div class="bookmark-accent-color-wrapper">
-                            <div class="bookmark-color-preview" id="bookmarkColorPreview"></div>
-                            <input type="color" id="bookmarkAccentColor" value="#8b5cf6" class="bookmark-color-input">
-                            <span class="bookmark-color-value" id="bookmarkColorValue">#8b5cf6</span>
-                        </div>
-                        <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-muted);">
-                            Customize the accent color used in the bookmark sidebar.
-                        </p>
-                    </div>
-
-                    <div class="settings-section" style="margin-bottom: 20px;">
-                        <label class="popup-toggle-label" style="margin: 0;">
-                            <span>Show Bookmark Count in Header</span>
-                            <div class="toggle-switch toggle-small">
-                                <input type="checkbox" id="bookmarkShowCount">
-                                <span class="slider"></span>
-                            </div>
-                        </label>
-                    </div>
-
-                    <div class="settings-section" style="margin-bottom: 20px;">
-                        <label class="popup-toggle-label" style="margin: 0;">
-                            <span>Enable Drag & Drop</span>
-                            <div class="toggle-switch toggle-small">
-                                <input type="checkbox" id="bookmarkEnableDragDrop">
-                                <span class="slider"></span>
-                            </div>
-                        </label>
-                        <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-muted);">
-                            Allow reordering bookmarks and folders by dragging.
-                        </p>
-                    </div>
-
-                    <div class="settings-section" style="margin-bottom: 20px;">
-                        <label class="popup-toggle-label" style="margin: 0;">
-                            <span>Show Search Bar</span>
-                            <div class="toggle-switch toggle-small">
-                                <input type="checkbox" id="bookmarkShowSearch">
-                                <span class="slider"></span>
-                            </div>
-                        </label>
-                    </div>
-
-                    <div class="settings-section">
-                        <label class="popup-toggle-label" style="margin: 0;">
-                            <span>Compact Mode</span>
-                            <div class="toggle-switch toggle-small">
-                                <input type="checkbox" id="bookmarkCompactMode">
-                                <span class="slider"></span>
-                            </div>
-                        </label>
-                        <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-muted);">
-                            Reduce spacing and font sizes for a more compact view.
-                        </p>
-                    </div>
-
-                    <div class="settings-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                        <label class="settings-section-title">
-                            Hidden Bookmarks
-                        </label>
-                        <div id="hiddenBookmarksList" style="margin-top: 10px;">
-                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">No hidden bookmarks</p>
-                        </div>
-                        <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-muted);">
-                            Bookmarks hidden in Pandorian will appear here. Right-click a bookmark in the sidebar and select "Hide in Pandorian" to hide it.
-                        </p>
-                    </div>
-
-                    <div class="settings-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                        <label class="settings-section-title">
-                            Hidden Websites
-                        </label>
-                        <div id="hiddenWebsitesList" style="margin-top: 10px;">
-                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Loading...</p>
-                        </div>
-                        <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-muted);">
-                            Websites where the sidebar is hidden. Right-click empty space in the sidebar and select "Hide on [website]" to hide it on that site.
-                        </p>
-                    </div>
-
-                    <div class="settings-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                        <label class="settings-section-title">
-                            Sidebar Visibility
-                        </label>
-                        <div id="sidebarVisibilityStatus" style="margin: 10px 0; padding: 12px; background: var(--bg-input); border-radius: 8px; font-size: 13px;">
-                            <p style="margin: 0; color: var(--text-muted);">Checking status...</p>
-                        </div>
-                        <button id="showSidebarBtn" class="btn btn-accent" style="width: 100%; margin-top: 10px; display: none;">
-                            Show Sidebar Now
-                        </button>
-                        <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-muted);">
-                            Right-click empty space in the sidebar to hide it temporarily or permanently.
-                        </p>
-                    </div>
-                </div>
-            </div>
         </main>
+
+        <!-- Keyboard Shortcuts Settings -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Keyboard Shortcuts Settings</span>
+            </div>
+            <div style="padding: 20px;">
+                <div class="settings-section" style="margin-bottom: 20px;">
+                    <label class="popup-toggle-label" style="margin: 0;">
+                        <span>Enable QR Code Generator (Ctrl+Q)</span>
+                        <div class="toggle-switch toggle-small">
+                            <input type="checkbox" id="enableQRCode">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+                    <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-muted);">
+                        Generate QR codes for the current page instantly.
+                    </p>
+                </div>
+
+                <p style="margin: 20px 0 0 0; font-size: 12px; color: var(--text-muted); opacity: 0.8;">
+                    You can customize keyboard shortcuts in Chrome's extension keyboard shortcuts settings (chrome://extensions/shortcuts).
+                </p>
+            </div>
+        </div>
 
         <!-- Keyboard Shortcuts Help -->
         <div class="card card-help">
@@ -265,16 +145,7 @@
             </div>
             <div style="padding: 0 0 15px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 15px;">
                 <p style="margin: 0 0 10px 0; font-size: 13px; color: var(--text-muted);">
-                    <strong style="color: var(--accent-glow);">Ctrl+K</strong> (or <strong style="color: var(--accent-glow);">Cmd+K</strong> on Mac) opens the Command Palette to quickly search and activate any shortcut.
-                </p>
-                <p style="margin: 0 0 10px 0; font-size: 13px; color: var(--text-muted);">
-                    <strong style="color: var(--accent-glow);">Ctrl+Q</strong> (or <strong style="color: var(--accent-glow);">Ctrl+Shift+Q</strong> on Mac) generates a QR code for the current page instantly, even when the extension popup is closed.
-                </p>
-                <p style="margin: 0 0 10px 0; font-size: 13px; color: var(--text-muted);">
-                    <strong style="color: var(--accent-glow);">Ctrl+V</strong> (or <strong style="color: var(--accent-glow);">Cmd+V</strong> on Mac) opens/closes the Bookmark Sidebar.
-                </p>
-                <p style="margin: 0 0 10px 0; font-size: 13px; color: var(--text-muted);">
-                    <strong style="color: var(--accent-glow);">Ctrl+B</strong> (or <strong style="color: var(--accent-glow);">Cmd+B</strong> on Mac) bookmarks the current page instantly.
+                    <strong style="color: var(--accent-glow);">Ctrl+Q</strong> (or <strong style="color: var(--accent-glow);">Cmd+Q</strong> on Mac) generates a QR code for the current page instantly, even when the extension popup is closed.
                 </p>
                 <p style="margin: 0; font-size: 12px; color: var(--text-muted); opacity: 0.8;">
                     You can also assign direct keyboard shortcuts (Ctrl+Shift+1-2) to your favorite shortcuts using the "Assign" button next to each shortcut. All keyboard shortcuts can be customized in Chrome's extension keyboard shortcuts settings.
@@ -309,10 +180,6 @@
                 </div>
                 <div class="help-section">
                     <h4>Global</h4>
-                    <div class="help-item">
-                        <kbd>Ctrl</kbd>+<kbd>K</kbd>
-                        <span>Open Command Palette</span>
-                    </div>
                     <div class="help-item">
                         <kbd>Ctrl</kbd>+<kbd>Q</kbd>
                         <span>Generate QR code for current page</span>

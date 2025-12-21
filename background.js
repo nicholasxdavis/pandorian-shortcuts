@@ -408,69 +408,103 @@ if (chrome.omnibox) {
 
 // Handle keyboard commands
 chrome.commands.onCommand.addListener((command) => {
-  if (command === 'open-command-palette') {
-    chrome.windows.create({
-      url: chrome.runtime.getURL('command-palette.html'),
-      type: 'popup',
-      width: 600,
-      height: 500,
-      focused: true
-    });
-    return;
-  }
+  // Check if command is enabled before executing
+  chrome.storage.sync.get(['keyboardShortcutSettings'], (result) => {
+    const settings = result.keyboardShortcutSettings || {
+      enableQRCode: true
+    };
 
-  if (command === 'generate-qr-code') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length === 0 || !tabs[0].url) {
-        Logger.warn('Unable to get current page URL for QR code');
+    if (command === 'generate-qr-code') {
+      if (settings.enableQRCode === false) {
+        Logger.log('QR Code generator is disabled');
         return;
       }
-
-      const url = tabs[0].url;
-      chrome.windows.create({
-        url: chrome.runtime.getURL(`qr-preview.html?url=${encodeURIComponent(url)}`),
-        type: 'popup',
-        width: 450,
-        height: 550,
-        focused: true
-      });
-    });
-    return;
-  }
-
-  // Handle quick shortcuts (1-4)
-  if (command.startsWith('quick-shortcut-')) {
-    const shortcutIndex = parseInt(command.replace('quick-shortcut-', '')) - 1;
-    
-    chrome.storage.sync.get(['shortcuts', 'keyboardShortcuts'], (result) => {
-      if (chrome.runtime.lastError) {
-        Logger.error('Failed to load shortcuts for command:', chrome.runtime.lastError);
-        return;
-      }
-
-      const shortcuts = result.shortcuts || [];
-      const keyboardShortcuts = result.keyboardShortcuts || {};
-      
-      // Find shortcut assigned to this command
-      const assignedShortcut = Object.entries(keyboardShortcuts).find(
-        ([key, cmd]) => cmd === command
-      );
-
-      if (assignedShortcut) {
-        const shortcut = shortcuts.find(s => s.key === assignedShortcut[0]);
-        if (shortcut) {
-          // Prompt for query
-          chrome.windows.create({
-            url: chrome.runtime.getURL(`command-palette.html?quick=${shortcut.key}`),
-            type: 'popup',
-            width: 400,
-            height: 200,
-            focused: true
-          });
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs.length === 0 || !tabs[0].url) {
+          Logger.warn('Unable to get current page URL for QR code');
+          return;
         }
-      }
-    });
-  }
+
+        const url = tabs[0].url;
+        chrome.windows.create({
+          url: chrome.runtime.getURL(`qr-preview.html?url=${encodeURIComponent(url)}`),
+          type: 'popup',
+          width: 450,
+          height: 565,
+          focused: true
+        });
+      });
+      return;
+    }
+
+    // Handle quick shortcuts (1-4)
+    if (command.startsWith('quick-shortcut-')) {
+      const shortcutIndex = parseInt(command.replace('quick-shortcut-', '')) - 1;
+      
+      chrome.storage.sync.get(['shortcuts', 'keyboardShortcuts'], (result) => {
+        if (chrome.runtime.lastError) {
+          Logger.error('Failed to load shortcuts for command:', chrome.runtime.lastError);
+          return;
+        }
+
+        const shortcuts = result.shortcuts || [];
+        const keyboardShortcuts = result.keyboardShortcuts || {};
+        
+        // Find shortcut assigned to this command
+        const assignedShortcut = Object.entries(keyboardShortcuts).find(
+          ([key, cmd]) => cmd === command
+        );
+
+        if (assignedShortcut) {
+          const shortcut = shortcuts.find(s => s.key === assignedShortcut[0]);
+          if (shortcut) {
+            // Prompt for query
+            chrome.windows.create({
+              url: chrome.runtime.getURL(`command-palette.html?quick=${shortcut.key}`),
+              type: 'popup',
+              width: 400,
+              height: 200,
+              focused: true
+            });
+          }
+        }
+      });
+    }
+
+    // Handle quick shortcuts (1-4)
+    if (command.startsWith('quick-shortcut-')) {
+      const shortcutIndex = parseInt(command.replace('quick-shortcut-', '')) - 1;
+      
+      chrome.storage.sync.get(['shortcuts', 'keyboardShortcuts'], (result) => {
+        if (chrome.runtime.lastError) {
+          Logger.error('Failed to load shortcuts for command:', chrome.runtime.lastError);
+          return;
+        }
+
+        const shortcuts = result.shortcuts || [];
+        const keyboardShortcuts = result.keyboardShortcuts || {};
+        
+        // Find shortcut assigned to this command
+        const assignedShortcut = Object.entries(keyboardShortcuts).find(
+          ([key, cmd]) => cmd === command
+        );
+
+        if (assignedShortcut) {
+          const shortcut = shortcuts.find(s => s.key === assignedShortcut[0]);
+          if (shortcut) {
+            // Prompt for query
+            chrome.windows.create({
+              url: chrome.runtime.getURL(`command-palette.html?quick=${shortcut.key}`),
+              type: 'popup',
+              width: 400,
+              height: 200,
+              focused: true
+            });
+          }
+        }
+      });
+    }
+  });
 });
 
 // Handle messages from popup/options

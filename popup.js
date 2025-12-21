@@ -75,7 +75,9 @@
      * Attach event listeners
      */
     function attachEventListeners() {
-        elements.toggle.addEventListener('change', handleToggleChange);
+        if (elements.toggle) {
+            elements.toggle.addEventListener('change', handleToggleChange);
+        }
         elements.btnOptions.addEventListener('click', handleOptionsClick);
         if (elements.btnHeaderOptions) {
             elements.btnHeaderOptions.addEventListener('click', handleOptionsClick);
@@ -114,8 +116,7 @@
                         handleOptionsClick();
                     }
                     break;
-                case 'o':
-                case 'O':
+                case '/':
                     if (e.ctrlKey || e.metaKey) {
                         e.preventDefault();
                         handleOptionsClick();
@@ -132,12 +133,14 @@
         });
 
         // Make toggle keyboard accessible
-        elements.toggle.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                elements.toggle.click();
-            }
-        });
+        if (elements.toggle) {
+            elements.toggle.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    elements.toggle.click();
+                }
+            });
+        }
     }
 
     /**

@@ -8,8 +8,7 @@
     "storage",
     "tabs",
     "webNavigation",
-    "omnibox",
-    "bookmarks"
+    "omnibox"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -46,12 +45,6 @@
       "js": ["content-script.js"],
       "run_at": "document_idle",
       "all_frames": false
-    },
-    {
-      "matches": ["<all_urls>"],
-      "js": ["bookmark-content.js"],
-      "run_at": "document_idle",
-      "all_frames": false
     }
   ],
   "background": {
@@ -78,8 +71,6 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "bookmark-sidebar.html",
-        "bookmark-sidebar.js",
         "styles.css",
         "img/*"
       ],
@@ -87,17 +78,10 @@
     }
   ],
   "commands": {
-    "open-command-palette": {
-      "suggested_key": {
-        "default": "Ctrl+K",
-        "mac": "Command+K"
-      },
-      "description": "Open Pandorian Command Palette"
-    },
     "generate-qr-code": {
       "suggested_key": {
         "default": "Ctrl+Q",
-        "mac": "Ctrl+Shift+Q"
+        "mac": "Command+Q"
       },
       "description": "Generate QR code for current page"
     },

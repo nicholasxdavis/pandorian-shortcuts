@@ -48,7 +48,7 @@
         },
         {
             title: 'Keyboard Shortcuts',
-            content: 'Press <kbd>Ctrl+K</kbd> (or <kbd>Cmd+K</kbd> on Mac) to open the Command Palette and quickly access any shortcut. You can also assign direct shortcuts (Ctrl+Shift+1-4) to favorites.',
+            content: 'Press <kbd>Ctrl+Q</kbd> (or <kbd>Cmd+Q</kbd> on Mac) to generate QR codes for the current page. You can also assign direct shortcuts (Ctrl+Shift+1-4) to favorites.',
             target: null,
             position: 'center'
         },
@@ -342,6 +342,18 @@
      * Start onboarding
      */
     function startOnboarding() {
+        // Clean up any existing onboarding
+        if (overlay) {
+            overlay.remove();
+            overlay = null;
+        }
+        if (tooltip) {
+            tooltip.remove();
+            tooltip = null;
+        }
+        
+        // Reset to first step
+        currentStep = 0;
         createOverlay();
         createTooltip();
         showStep(0);
@@ -367,6 +379,9 @@
             }
         });
     }
+
+    // Make startOnboarding available globally for show tour button
+    window.startOnboarding = startOnboarding;
 
     // Initialize
     init();

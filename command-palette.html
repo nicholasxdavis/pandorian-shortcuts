@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandorian Command Palette</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 600px;
+            max-height: 500px;
+            overflow: hidden;
+        }
+        .palette-container {
+            background: var(--bg-main);
+            border-radius: 0;
+        }
+        .palette-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-card);
+        }
+        .palette-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            color: var(--text-main);
+        }
+        .palette-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        .palette-search {
+            margin: 20px;
+            position: relative;
+        }
+        .palette-search input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            background: var(--bg-input);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .palette-search input:focus {
+            outline: none;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        .palette-search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        .palette-results {
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .palette-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 4px;
+        }
+        .palette-item:hover,
+        .palette-item.selected {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid var(--accent-glow);
+        }
+        .palette-item-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .palette-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .palette-item-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+        .palette-item-key {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+        }
+        .palette-item-shortcut {
+            font-size: 11px;
+            color: var(--accent-glow);
+            margin-left: 12px;
+            padding: 2px 6px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 4px;
+        }
+        .palette-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .palette-hint {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-card);
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+        .palette-hint-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .palette-hint kbd {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="palette-container">
+        <div class="palette-header">
+            <h1 class="palette-title">Pandorian Command Palette</h1>
+            <p class="palette-subtitle">Search and activate shortcuts instantly</p>
+        </div>
+        <div class="palette-search">
+            <svg class="palette-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" id="paletteInput" placeholder="Type to search shortcuts..." autocomplete="off" autofocus>
+        </div>
+        <div class="palette-results" id="paletteResults">
+            <!-- Results injected here -->
+        </div>
+        <div class="palette-hint">
+            <div class="palette-hint-item">
+                <kbd>↑</kbd><kbd>↓</kbd> Navigate
+            </div>
+            <div class="palette-hint-item">
+                <kbd>Enter</kbd> Activate
+            </div>
+            <div class="palette-hint-item">
+                <kbd>Esc</kbd> Close
+            </div>
+            <div class="palette-hint-item" style="opacity: 0.6; font-size: 10px;">
+                Tip: Customize shortcut in extension settings
+            </div>
+        </div>
+    </div>
+    <script src="command-palette.js"></script>
+</body>
+</html>
+

@@ -1,3 +1,5 @@
+![Pandorian Header](https://raw.githubusercontent.com/nicholasxdavis/pandorian-shortcuts/main/img/logo.png)
+
 # Pandorian - A Shortcut
 
 ![Pandorian Logo](https://img.shields.io/badge/Pandorian-Browser%20Extension-purple) ![Chrome](https://img.shields.io/badge/platform-Chrome%20%7C%20Edge-blue) ![License](https://img.shields.io/badge/license-MIT-green)
@@ -61,17 +63,9 @@ If you want to install from source or use the development version:
 
 3. Press Enter and Pandorian will instantly redirect you to the target site with your search query.
 
-### Command Palette
-
-Press **Ctrl+K** (or **Cmd+K** on Mac) to open the Command Palette. This lets you quickly search and activate any shortcut without typing in a search engine.
-
 ### QR Code Generation
 
-Press **Ctrl+Q** (or **Ctrl+Shift+Q** on Mac) to instantly generate a QR code for the current page. Perfect for sharing links to your mobile device.
-
-### Bookmark Sidebar
-
-Hover over the left edge of any webpage to access your bookmarks in a beautiful sidebar. Press **Ctrl+V** (or **Cmd+V** on Mac) to toggle it.
+Press **Ctrl+Q** (or **Cmd+Q** on Mac) to instantly generate a QR code for the current page. Perfect for sharing links to your mobile device.
 
 ### Managing Shortcuts
 
@@ -136,6 +130,68 @@ To create a `.zip` file for distribution:
 
 ---
 
+## Development
+
+### Running in Development Mode
+
+1. Load the extension as described in the **Manual Installation** section above.
+
+2. Make changes to any file.
+
+3. Go to `chrome://extensions/` and click the refresh icon on the Pandorian card.
+
+4. Test your changes immediately.
+
+### Code Structure
+
+#### Background Service Worker (`background.js`)
+
+Handles:
+* URL interception and processing
+* Search query extraction from various search engines
+* Shortcut matching and redirection
+* Omnibox integration
+* Keyboard command handling
+* Storage management
+
+#### Popup (`popup.html` / `popup.js`)
+
+Handles:
+* Extension status toggle
+* Quick access to options
+* QR code generation
+* Shortcut count display
+
+#### Options Page (`options.html` / `options.js`)
+
+Handles:
+* Shortcut management (add, edit, delete)
+* Import/Export functionality
+* Bookmark sidebar settings
+* Keyboard shortcuts configuration
+
+#### Content Scripts (`content-script.js`, `bookmark-content.js`)
+
+Handles:
+* Visual indicators on search pages
+* Bookmark sidebar injection
+* Page interaction
+
+#### Styling (`styles.css`)
+
+Uses modern CSS with:
+* Dark mode theme
+* Responsive design
+* Smooth animations
+* Accessible UI components
+
+---
+
+<h3 align="left">Support:</h3>
+
+<p><a href="https://www.buymeacoffee.com/galore"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="galore" /></a></p><br><br>
+
+---
 
 ## License
 
@@ -143,5 +199,42 @@ MIT License
 
 Copyright (c) 2025 Blacnova Development
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+
+of this software and associated documentation files (the "Software"), to deal
+
+in the Software without restriction, including without limitation the rights
+
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+
+copies of the Software, and to permit persons to whom the Software is
+
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+
+SOFTWARE.
 
 ---
+
+## Star History
+
+![Star History Chart](https://api.star-history.com/svg?repos=nicholasxdavis/pandorian-shortcuts\&type=Date)
+
+---
+
+**Made for developers and power users who want to navigate the web faster.**

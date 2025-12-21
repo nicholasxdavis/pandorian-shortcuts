@@ -12,6 +12,10 @@
             <div class="popup-status-group">
                 <span id="statusDot" class="status-indicator"></span>
                 <span id="statusText" class="status-text active">Enabled</span>
+                <div class="toggle-switch toggle-tiny">
+                    <input type="checkbox" id="popupToggle" aria-label="Toggle extension">
+                    <span class="slider"></span>
+                </div>
             </div>
         </div>
         <button id="btnHeaderOptions" class="btn-header-options" title="Open Options" aria-label="Open Options">
@@ -22,25 +26,12 @@
         </button>
     </div>
 
-    <div class="popup-toggle-section">
-        <label class="popup-toggle-label">
-            <span>Extension Enabled</span>
-            <div class="toggle-switch toggle-small">
-                <input type="checkbox" id="popupToggle" aria-label="Toggle extension">
-                <span class="slider"></span>
-            </div>
-        </label>
-    </div>
-
     <div class="popup-info">
         <p class="popup-info-text">
             Type <strong class="highlight">drake @g</strong> in any search engine to search Genius instantly.
         </p>
         <p class="popup-info-subtext">
             <span id="shortcutsCount" class="count-badge">0</span> shortcuts configured
-        </p>
-        <p class="popup-keyboard-hint">
-            Press <kbd>Ctrl+K</kbd> to open Command Palette
         </p>
     </div>
 
@@ -70,9 +61,9 @@
     </div>
 
     <div class="popup-footer">
-        <p class="popup-hint">
-            <kbd>Enter</kbd> or <kbd>Ctrl+O</kbd> to open options
-        </p>
+            <p class="popup-hint">
+                <kbd>Enter</kbd> or <kbd>Ctrl+/</kbd> to open options
+            </p>
         <p class="popup-branding">Pandorian by Blacnova</p>
         <p class="popup-location">Developed in the United States</p>
     </div>

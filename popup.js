@@ -8,6 +8,8 @@
 
     const elements = {
         toggle: null,
+        leftBox: null,
+        rightBox: null,
         dot: null,
         btnOptions: null,
         btnHeaderOptions: null,
@@ -25,7 +27,8 @@
      */
     function init() {
         try {
-            elements.toggle = document.getElementById('popupToggle');
+            elements.leftBox = document.getElementById('leftBox');
+            elements.rightBox = document.getElementById('rightBox');
             elements.dot = document.getElementById('statusDot');
             elements.btnOptions = document.getElementById('btnOptions');
             elements.btnHeaderOptions = document.getElementById('btnHeaderOptions');
@@ -37,7 +40,7 @@
             elements.qrCodeContainer = document.getElementById('qrCodeContainer');
             elements.qrModalUrl = document.getElementById('qrModalUrl');
 
-            if (!elements.toggle || !elements.dot || !elements.btnOptions || !elements.btnQRCode) {
+            if (!elements.leftBox || !elements.rightBox || !elements.dot || !elements.btnOptions || !elements.btnQRCode) {
                 console.error('[Pandorian] Missing required elements');
                 return;
             }
@@ -60,7 +63,6 @@
             }
 
             const isEnabled = result.enabled !== false;
-            elements.toggle.checked = isEnabled;
             updateUI(isEnabled);
 
             // Show shortcuts count
@@ -75,9 +77,20 @@
      * Attach event listeners
      */
     function attachEventListeners() {
-        if (elements.toggle) {
-            elements.toggle.addEventListener('change', handleToggleChange);
+        // Left box click - Disable
+        if (elements.leftBox) {
+            elements.leftBox.addEventListener('click', () => {
+                handleToggleChange(false);
+            });
         }
+        
+        // Right box click - Enable
+        if (elements.rightBox) {
+            elements.rightBox.addEventListener('click', () => {
+                handleToggleChange(true);
+            });
+        }
+        
         elements.btnOptions.addEventListener('click', handleOptionsClick);
         if (elements.btnHeaderOptions) {
             elements.btnHeaderOptions.addEventListener('click', handleOptionsClick);
@@ -110,11 +123,7 @@
             // Global shortcuts
             switch (e.key) {
                 case 'Enter':
-                    if (document.activeElement === elements.toggle) {
-                        elements.toggle.click();
-                    } else {
-                        handleOptionsClick();
-                    }
+                    handleOptionsClick();
                     break;
                 case '/':
                     if (e.ctrlKey || e.metaKey) {
@@ -131,29 +140,15 @@
                     break;
             }
         });
-
-        // Make toggle keyboard accessible
-        if (elements.toggle) {
-            elements.toggle.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    elements.toggle.click();
-                }
-            });
-        }
     }
 
     /**
      * Handle toggle change
      */
-    function handleToggleChange(e) {
-        const isEnabled = e.target.checked;
-        
+    function handleToggleChange(isEnabled) {
         chrome.storage.sync.set({ enabled: isEnabled }, () => {
             if (chrome.runtime.lastError) {
                 console.error('[Pandorian] Failed to save state:', chrome.runtime.lastError);
-                // Revert toggle on error
-                elements.toggle.checked = !isEnabled;
                 showToast('Failed to save settings', 'error');
                 return;
             }
@@ -261,11 +256,17 @@
                 elements.statusText.textContent = 'Enabled';
                 elements.statusText.className = 'status-text active';
             }
+            if (elements.rightBox) {
+                elements.rightBox.classList.add('active');
+            }
         } else {
             elements.dot.classList.add('off');
             if (elements.statusText) {
                 elements.statusText.textContent = 'Disabled';
                 elements.statusText.className = 'status-text disabled';
+            }
+            if (elements.rightBox) {
+                elements.rightBox.classList.remove('active');
             }
         }
     }

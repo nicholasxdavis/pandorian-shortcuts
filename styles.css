@@ -679,6 +679,7 @@ input[type="range"]::-moz-range-track {
     width: 50px;
     height: 28px;
     overflow: hidden;
+    background: transparent;
 }
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
 .slider {
@@ -686,7 +687,7 @@ input[type="range"]::-moz-range-track {
     cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(255, 255, 255, 0.1);
-    transition: all var(--transition-slow);
+    transition: background-color var(--transition-base), box-shadow var(--transition-base);
     border-radius: 34px;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -699,7 +700,7 @@ input[type="range"]::-moz-range-track {
     left: 4px;
     bottom: 4px;
     background-color: white;
-    transition: all var(--transition-slow);
+    transition: transform var(--transition-base);
     border-radius: 50%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -906,7 +907,7 @@ body.popup-body {
     width: 32px;
     height: 18px;
     flex-shrink: 0;
-    overflow: hidden;
+    margin-top: 4px;
 }
 
 .toggle-tiny .slider {
@@ -918,12 +919,50 @@ body.popup-body {
     width: 12px;
     left: 3px;
     bottom: 3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 input:checked + .toggle-tiny .slider:before {
-    transform: translateX(14px);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transform: translateX(12px);
+}
+
+/* Toggle Squares */
+.toggle-squares {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.toggle-square {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    border-radius: 0;
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+}
+
+.toggle-square-left {
+    background-color: #1e1f20;
+}
+
+.toggle-square-right {
+    background-color: #131314;
+}
+
+.toggle-square:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.toggle-square:active {
+    transform: scale(0.95);
+}
+
+.toggle-square-right.active {
+    background-color: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
 }
 
 .popup-footer {
@@ -996,22 +1035,6 @@ kbd:hover {
     cursor: pointer;
 }
 
-.btn-qr-with-text::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transition: left 0.5s;
-    z-index: 0;
-    pointer-events: none;
-}
-
-.btn-qr-with-text:hover::before {
-    left: 100%;
-}
 
 .btn-qr-with-text:hover {
     background: rgba(139, 92, 246, 0.25);

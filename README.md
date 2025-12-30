@@ -1,3 +1,5 @@
+![Pandorian Screenshot](https://lh3.googleusercontent.com/JFccX-Q8kBH4ndP5csn9AisGoAHXL3YAJaXgTcyD0AlVF0AydTz_7tfn2ekQ9nxy584IeHSq_izeNdbobKwdmboS=s1280-w1280-h800)
+
 # Pandorian - A Shortcut
 
 ![Pandorian Logo](https://img.shields.io/badge/Pandorian-Browser%20Extension-purple) ![Chrome](https://img.shields.io/badge/platform-Chrome%20%7C%20Edge-blue) ![License](https://img.shields.io/badge/license-MIT-green)

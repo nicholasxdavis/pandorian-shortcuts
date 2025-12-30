@@ -5,6 +5,7 @@
 **The ultimate command bar for your browser. Use @tags to navigate instantly. Search any site with custom shortcuts.**
 
 ---
+![Download](https://img.shields.io/badge/Download-Chrome-purple)
 
 ## Overview
 

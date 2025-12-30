@@ -7,7 +7,6 @@
 **The ultimate command bar for your browser. Use @tags to navigate instantly. Search any site with custom shortcuts.**
 
 ---
-![Download](https://img.shields.io/badge/Download-Chrome-purple)
 
 ## Overview
 
@@ -19,15 +18,8 @@ I built this because I was tired of opening multiple tabs, copying URLs, and man
 
 ## Installation
 
-### Chrome Web Store (Coming Soon)
-
-1. Visit the Chrome Web Store (link will be added when published).
-
-2. Click **Add to Chrome**.
-
-3. Confirm installation.
-
-4. Once installed, Pandorian will be ready to use immediately with 9 pre-configured shortcuts.
+### Chrome Web Store 
+![Download](https://img.shields.io/badge/Download-Chrome-purple)
 
 ### Manual Installation
 
